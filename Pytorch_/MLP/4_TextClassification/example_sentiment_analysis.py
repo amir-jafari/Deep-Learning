@@ -11,7 +11,7 @@ nltk.download('punkt')
 
 if "SST-2" not in os.listdir(os.getcwd()):
     try:
-        os.system("wget https://firebasestorage.googleapis.com/v0/b/mtl-sentence-representations.appspot.com/o/data%2FSST-2.zip?alt=media&token=aabc5f6b-e466-44a2-b9b4-cf6337f84ac8")
+        os.system("wget https://dl.fbaipublicfiles.com/glue/data/SST-2.zip")
         os.system("unzip SST-2.zip")
     except:
         print("There was a problem with the download!")
