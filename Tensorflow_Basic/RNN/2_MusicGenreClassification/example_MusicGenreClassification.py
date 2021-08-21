@@ -107,7 +107,7 @@ model1.compile(optimizer=RMSprop(lr=LR), loss="categorical_crossentropy", metric
 
 # %% -------------------------------------- Training Loop ----------------------------------------------------------
 print("Starting training loop...")
-model1.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=N_EPOCHS, validation_data=(x_test, y_test),
+model1.fit(tf.cast(x_train,tf.float32), tf.cast(y_train,tf.float32), batch_size=BATCH_SIZE, epochs=N_EPOCHS, validation_data=(tf.cast(x_test,tf.float32), tf.cast(y_test,tf.float32)),
            callbacks=[ModelCheckpoint("example_cnn_lstm_music_genre_classifier.hdf5", monitor="val_accuracy", save_best_only=True)])
 
 # %% ------------------------------------------ Final Test -------------------------------------------------------------
