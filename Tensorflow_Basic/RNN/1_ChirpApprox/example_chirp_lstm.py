@@ -3,9 +3,9 @@ import os
 import random
 import numpy as np
 import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import LSTM, Dense
-from keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
+from tensorflow.keras.optimizers import Adam
 from scipy.signal import chirp
 import matplotlib.pyplot as plt
 

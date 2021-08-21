@@ -1,15 +1,11 @@
 # %% --------------------------------------- Imports -------------------------------------------------------------------
-import os
-import random
-import numpy as np
-import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, BatchNormalization, Conv2D, Flatten, MaxPooling2D, AveragePooling2D
-from keras.optimizers import Adam
-from keras.datasets import mnist
-from keras.utils import to_categorical
-from keras import backend as K
-import keras
+import tensorflow
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Conv2D, Flatten, MaxPooling2D, AveragePooling2D
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras import backend as K
 # %% --------------------------------------- Set-Up --------------------------------------------------------------------
 # SEED = 42
 # os.environ['PYTHONHASHSEED'] = str(SEED)
@@ -46,8 +42,8 @@ print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
 
 # convert class vectors to binary class matrices
-y_train = keras.utils.to_categorical(y_train, num_classes)
-y_test = keras.utils.to_categorical(y_test, num_classes)
+y_train = tensorflow.keras.utils.to_categorical(y_train, num_classes)
+y_test = tensorflow.keras.utils.to_categorical(y_test, num_classes)
 # %% -------------------------------------- Training Prep ----------------------------------------------------------
 model = Sequential([
     Conv2D(16, (3,3),  activation="relu"),

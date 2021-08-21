@@ -9,10 +9,10 @@ import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, BatchNormalization, Conv1D, Flatten
-from keras.optimizers import Adam
-from keras.utils import to_categorical
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Conv1D, Flatten
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import confusion_matrix
 
 if "WISDM_ar_v1.1" not in os.listdir(os.getcwd()):

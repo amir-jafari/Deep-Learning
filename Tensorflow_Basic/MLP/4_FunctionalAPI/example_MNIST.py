@@ -3,11 +3,11 @@ import os
 import random
 import numpy as np
 import tensorflow as tf
-from keras.models import Model
-from keras.layers import Dense, Dropout, BatchNormalization
-from keras.optimizers import Adam
-from keras.datasets import mnist
-from keras.utils import to_categorical
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense, Dropout, BatchNormalization, Add
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.utils import to_categorical
 
 
 # %% --------------------------------------- Set-Up --------------------------------------------------------------------
@@ -29,27 +29,21 @@ DROPOUT = 0.2
 x_train, x_test = x_train.reshape(len(x_train), -1), x_test.reshape(len(x_test), -1)
 y_train, y_test = to_categorical(y_train, num_classes=10), to_categorical(y_test, num_classes=10)
 
-
-# %% -------------------------------------- Training Prep --------------------------------------------------------------
-class MLP(Model):
-    # This model is equivalent to the one defined on 4_FuncionalAPI/example_MNIST.py
-    # Notice we don't need to use the Input class nor the Add layer
-    def __init__(self):
-        super(MLP, self).__init__()
-        self.dense1 = Dense(N_NEURONS[0], activation='relu')
-        self.dense2 = Dense(784, activation='relu')
-        self.drop = Dropout(DROPOUT)
-        self.bn = BatchNormalization()
-        self.dense3 = Dense(N_NEURONS[1], activation="relu")
-        self.out = Dense(10, activation="softmax")
-
-    def call(self, x):  # This method will be called inside model.fit()
-        xx = self.drop(self.dense2(self.dense1(x)))
-        xx = self.bn(xx + x)  # Replaces the Add layer just with + operation
-        return self.out(self.drop(self.dense3(xx)))
-
-
-model = MLP()
+# %% -------------------------------------- Training Prep ----------------------------------------------------------
+# Gets an instance of Input class with the right shape
+inputs = Input(shape=(784,))
+# Defines a succession of layers
+x = Dense(N_NEURONS[0], activation='relu')(inputs)
+x = Dense(784, activation='relu')(x)
+x = Dropout(DROPOUT)(x)
+# We add the original input to the output of the dropout before BatchNormalization
+x = Add()([x, inputs])
+x = BatchNormalization()(x)
+x = Dense(N_NEURONS[1], activation='relu')(x)
+x = Dropout(DROPOUT)(x)
+probs = Dense(10, activation="softmax")(x)
+# Gets an instance of Model class based on inputs and probs, which has kept track of all the operations in-between
+model = Model(inputs=inputs, outputs=probs)
 model.compile(optimizer=Adam(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
 
 # %% -------------------------------------- Training Loop ----------------------------------------------------------

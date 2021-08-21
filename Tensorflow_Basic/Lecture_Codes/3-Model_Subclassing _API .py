@@ -1,11 +1,11 @@
 # %%---------------------------------------------------------------------------------------------
-import keras
-from keras import layers
+import tensorflow
+from tensorflow.keras import layers
 import numpy as np
 x = np.linspace(-4,4,500).reshape(-1,1)
 y = np.sin(x)
 
-class Mymodel(keras.Model):
+class Mymodel(tensorflow.keras.Model):
     def __init__(self):
         super(Mymodel,self).__init__()
         self.dense1 = layers.Dense(1, activation='relu')

@@ -5,11 +5,11 @@ import random
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, BatchNormalization
-from keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
+from tensorflow.keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
-from keras.wrappers.scikit_learn import KerasRegressor
+from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import GridSearchCV, KFold
 
 if "ENB2012_data.xlsx" not in os.listdir(os.getcwd()):

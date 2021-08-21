@@ -3,12 +3,12 @@ import os
 import random
 import numpy as np
 import tensorflow as tf
-from keras.models import Sequential
-from keras.layers import Conv1D, BatchNormalization, LSTM, Dense, MaxPooling1D
-from keras.optimizers import RMSprop
-from keras.utils import to_categorical
-from keras.callbacks import ModelCheckpoint
-from keras.models import load_model
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Conv1D, BatchNormalization, LSTM, Dense, MaxPooling1D
+from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.callbacks import ModelCheckpoint
+from tensorflow.keras.models import load_model
 from sklearn.model_selection import train_test_split
 from scipy.io import wavfile
 from sklearn.metrics import confusion_matrix

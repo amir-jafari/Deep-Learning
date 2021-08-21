@@ -1,9 +1,9 @@
 # %% --------------------------------------- Imports -------------------------------------------------------------------
 import numpy as np
 import matplotlib.pyplot as plt
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.optimizers import SGD
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.optimizers import SGD
 
 
 # %% ----------------------------------- Hyper Parameters --------------------------------------------------------------

@@ -3,12 +3,12 @@ import os
 import random
 import numpy as np
 import tensorflow as tf
-from keras.initializers import glorot_uniform
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, BatchNormalization, Activation
-from keras.optimizers import Adam
-from keras.datasets import mnist
-from keras.utils import to_categorical
+from tensorflow.keras.initializers import glorot_uniform
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, BatchNormalization, Activation
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.utils import to_categorical
 
 
 # %% --------------------------------------- Set-Up --------------------------------------------------------------------

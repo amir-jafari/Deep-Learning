@@ -1,10 +1,10 @@
-import keras
-from keras import layers
+import tensorflow
+from tensorflow.keras import layers
 import numpy as np
 x = np.linspace(-4,4,500)
 y = np.sin(x)
 
-model = keras.Sequential()
+model = tensorflow.keras.Sequential()
 
 model.add(layers.Dense(10, activation='relu' , input_shape=(1,)))
 model.add(layers.Dense(1, activation='linear' , input_shape=(10,)))
@@ -12,27 +12,27 @@ model.add(layers.Dense(1, activation='linear' , input_shape=(10,)))
 model.compile(loss='mse',optimizer='sgd',metrics=['accuracy'])
 model.fit(x, y, epochs=10)
 # # %%---------------------------------------------------------------------------------------------
-import keras
-from keras import layers
+import tensorflow
+from tensorflow.keras import layers
 import numpy as np
 x = np.linspace(-4,4,500)
 y = np.sin(x)
 
-inputs = keras.Input(shape=(1,))
+inputs = tensorflow.keras.Input(shape=(1,))
 x1 =layers.Dense(10,activation='relu')(inputs)
 ouputs = layers.Dense(1, activation='relu')(x1)
 
-model = keras.Model(inputs, ouputs)
+model = tensorflow.keras.Model(inputs, ouputs)
 model.compile(loss='mse',optimizer='sgd',metrics=['accuracy'])
 model.fit(x, y, epochs=10)
 # %%---------------------------------------------------------------------------------------------
-import keras
-from keras import layers
+import tensorflow
+from tensorflow.keras import layers
 import numpy as np
 x = np.linspace(-4,4,500).reshape(-1,1)
 y = np.sin(x)
 
-class Mymodel(keras.Model):
+class Mymodel(tensorflow.keras.Model):
     def __init__(self):
         super(Mymodel,self).__init__()
         self.dense1 = layers.Dense(1, activation='relu')
@@ -49,12 +49,11 @@ model = Mymodel()
 model.compile(loss='mse',optimizer='sgd',metrics=['accuracy'])
 model.fit(x, y, epochs=10)
 # %%---------------------------------------------------------------------------------------------
-from __future__ import print_function
-import keras
-from keras.datasets import mnist
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
-from keras.optimizers import RMSprop
+import tensorflow
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+from tensorflow.keras.optimizers import RMSprop
 
 batch_size = 128
 num_classes = 10
@@ -71,8 +70,8 @@ x_test /= 255
 print(x_train.shape[0], 'train samples')
 print(x_test.shape[0], 'test samples')
 
-y_train = keras.utils.to_categorical(y_train, num_classes)
-y_test = keras.utils.to_categorical(y_test, num_classes)
+y_train = tensorflow.keras.utils.to_categorical(y_train, num_classes)
+y_test = tensorflow.keras.utils.to_categorical(y_test, num_classes)
 
 model = Sequential()
 model.add(Dense(512, activation='relu', input_shape=(784,)))

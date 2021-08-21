@@ -1,12 +1,12 @@
 # %% --------------------------------------- Imports -------------------------------------------------------------------
 import numpy as np
 import matplotlib.pyplot as plt
-from keras.models import Sequential
-from keras.layers import Dense, Activation
-from keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
+from tensorflow.keras.optimizers import Adam
 from sklearn.metrics import accuracy_score
-from keras.utils import to_categorical
-from keras.initializers import glorot_uniform
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.initializers import glorot_uniform
 
 # %% ----------------------------------- Hyper Parameters --------------------------------------------------------------
 LR = 0.2
