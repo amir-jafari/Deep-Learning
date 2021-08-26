@@ -4,7 +4,7 @@
 
 * Pytorch
 
-* Tensorflow 2.X
+* Tensorflow Adavnce
 
-* Keras
+* Tensorflow Basic
 
