@@ -14,6 +14,6 @@
 # 4. Use model.evaluate to get the final accuracy on the whole set and print it out
 
 # 5. Make a contour plot of the MLP as a function of the x and y axis. You can follow
-# https://scikit-learn.org/stable/auto_examples/semi_supervised/plot_label_propagation_versus_svm_iris.html
+# https://scikit-learn.org/0.18/auto_examples/semi_supervised/plot_label_propagation_versus_svm_iris.html
 
 # %% -------------------------------------------------------------------------------------------------------------------
