@@ -26,6 +26,7 @@ class MLP(nn.Module):
         self.l2 = nn.Linear(20, 10)
         self.t2 = nn.LogSoftmax(dim=1)
 
+
     def forward(self, x):
         x = x.view(-1, 1 * 28 * 28)
         x = self.t1(self.l1(x))
@@ -74,6 +75,8 @@ def Model_test(dataloader):
           100. * correct / len(testloader.dataset)))
 
 # --------------------------------------------------------------------------------------------
+
+
 # run the training epoch 30 times and test the result
 for epoch in range(30):
     trainEpoch(trainloader, epoch)
