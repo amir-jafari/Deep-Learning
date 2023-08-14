@@ -18,8 +18,6 @@ LR = 5e-2
 N_EPOCHS = 30
 BATCH_SIZE = 512
 DROPOUT = 0.5
-
-
 # %% ----------------------------------- Helper Functions --------------------------------------------------------------
 def acc(x, y, return_labels=False):
     with torch.no_grad():
