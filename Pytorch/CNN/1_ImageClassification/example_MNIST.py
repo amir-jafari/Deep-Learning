@@ -88,7 +88,3 @@ for epoch in range(N_EPOCHS):
 
     print("Epoch {} | Train Loss {:.5f}, Train Acc {:.2f} - Test Loss {:.5f}, Test Acc {:.2f}".format(
         epoch, loss_train/BATCH_SIZE, acc(x_train, y_train), loss_test, acc(x_test, y_test)))
-
-
-
-print('Amir')
