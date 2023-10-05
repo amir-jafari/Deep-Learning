@@ -76,7 +76,6 @@ def eval(x, y):
     test_loss(loss)
     test_accuracy(y, logits)
 
-
 # %% -------------------------------------- Training Loop ----------------------------------------------------------
 print("Starting training loop...")
 for epoch in range(N_EPOCHS):
