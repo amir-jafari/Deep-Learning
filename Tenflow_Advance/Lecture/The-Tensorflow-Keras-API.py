@@ -5,7 +5,7 @@ p = np.linspace(-2, 2, 100)
 t = np.sin(np.pi*p)
 
 model = tf.keras.models.Sequential([
-  tf.keras.layers.Dense(10, activation='tanh'),
+  tf.keras.layers.Dense(10, activation='tanh', input_shape=(1,)),
   tf.keras.layers.Dense(1, activation='linear')
 ])
 
