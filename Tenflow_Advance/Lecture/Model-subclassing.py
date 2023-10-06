@@ -1,15 +1,13 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
-p = np.linspace(-2, 2, 100)
+p = np.linspace(-2, 2, 100).reshape(-1,1)
 t = np.sin(np.pi*p)
-
 
 class MyModel(tf.keras.Model):
   def __init__(self):
     super(MyModel, self).__init__()
-    inputs = tf.keras.Input(shape=(1))
-    self.x1 = tf.keras.layers.Dense(512, activation='relu', name='d1')
+    self.x1 = tf.keras.layers.Dense(512, activation='relu', name='d1', input_shape=(1,))
     self.predictions = tf.keras.layers.Dense(1, name='d2')
 
   def call(self, inputs):
