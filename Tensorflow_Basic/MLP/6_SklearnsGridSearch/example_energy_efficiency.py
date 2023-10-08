@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-# from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import GridSearchCV, KFold
 from sklearn.base import BaseEstimator, RegressorMixin
 # from tensorflow.keras.models import clone_model

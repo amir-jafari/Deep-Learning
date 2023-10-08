@@ -3,12 +3,6 @@ import os
 import random
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv1D, BatchNormalization, LSTM, Dense, MaxPooling1D
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.models import load_model
 from sklearn.model_selection import train_test_split
 from scipy.io import wavfile
 from sklearn.metrics import confusion_matrix
@@ -74,44 +68,44 @@ x, y, labels = load_data()
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=SEED, stratify=y)
 # Reshapes to (batch_size, timesteps, input_dim). We have only one channel (input_dim) due to mono audio files
 x_train, x_test = x_train.reshape(len(x_train), -1, 1), x_test.reshape(len(x_test), -1, 1)
-y_train, y_test = to_categorical(y_train, num_classes=10), to_categorical(y_test, num_classes=10)
+y_train, y_test = tf.keras.utils.to_categorical(y_train, num_classes=10), tf.keras.utils.to_categorical(y_test, num_classes=10)
 
 # %% -------------------------------------- Training Prep ----------------------------------------------------------
-model1 = Sequential([
-    Conv1D(8, 3, activation="relu"),
-    MaxPooling1D(4),
-    BatchNormalization(),
-    Conv1D(16, 3, activation="relu"),
-    MaxPooling1D(4),
-    BatchNormalization(),
-    Conv1D(32, 3, activation="relu"),
-    MaxPooling1D(4),
-    BatchNormalization(),
-    Conv1D(64, 3, activation="relu"),
-    BatchNormalization(),
-    MaxPooling1D(4),
-    Conv1D(128, 3, activation="relu"),
-    BatchNormalization(),
-    MaxPooling1D(4),
-    Conv1D(256, 3, activation="relu"),
-    MaxPooling1D(4),
-    BatchNormalization(),
+model1 = tf.keras.models.Sequential([
+    tf.keras.layers.Conv1D(8, 3, activation="relu"),
+    tf.keras.layers.MaxPooling1D(4),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv1D(16, 3, activation="relu"),
+    tf.keras.layers.MaxPooling1D(4),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv1D(32, 3, activation="relu"),
+    tf.keras.layers.MaxPooling1D(4),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.Conv1D(64, 3, activation="relu"),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPooling1D(4),
+    tf.keras.layers.Conv1D(128, 3, activation="relu"),
+    tf.keras.layers.BatchNormalization(),
+    tf.keras.layers.MaxPooling1D(4),
+    tf.keras.layers.Conv1D(256, 3, activation="relu"),
+    tf.keras.layers.MaxPooling1D(4),
+    tf.keras.layers.BatchNormalization(),
     # MaxPooling1D(4),
 ])
 HIDDEN_SIZES[0] = 256
 for hidden_size in HIDDEN_SIZES[:-1]:  # If we want more than one LSTM layer, we need to return the sequences on all the layers
-    model1.add(LSTM(units=hidden_size, dropout=DROPOUT, recurrent_dropout=DROPOUT, return_sequences=True))  # except for the last one
-model1.add(LSTM(units=HIDDEN_SIZES[-1], dropout=DROPOUT, recurrent_dropout=DROPOUT))
-model1.add(Dense(10, activation="softmax"))
-model1.compile(optimizer=RMSprop(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
+    model1.add(tf.keras.layers.LSTM(units=hidden_size, dropout=DROPOUT, recurrent_dropout=DROPOUT, return_sequences=True))  # except for the last one
+model1.add(tf.keras.layers.LSTM(units=HIDDEN_SIZES[-1], dropout=DROPOUT, recurrent_dropout=DROPOUT))
+model1.add(tf.keras.layers.Dense(10, activation="softmax"))
+model1.compile(optimizer=tf.keras.optimizers.RMSprop(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
 
 # %% -------------------------------------- Training Loop ----------------------------------------------------------
 print("Starting training loop...")
 model1.fit(tf.cast(x_train,tf.float32), tf.cast(y_train,tf.float32), batch_size=BATCH_SIZE, epochs=N_EPOCHS, validation_data=(tf.cast(x_test,tf.float32), tf.cast(y_test,tf.float32)),
-           callbacks=[ModelCheckpoint("example_cnn_lstm_music_genre_classifier.hdf5", monitor="val_accuracy", save_best_only=True)])
+           callbacks=[tf.keras.callbacks.ModelCheckpoint("example_cnn_lstm_music_genre_classifier.hdf5", monitor="val_accuracy", save_best_only=True)])
 
 # %% ------------------------------------------ Final Test -------------------------------------------------------------
-model = load_model('example_cnn_lstm_music_genre_classifier.hdf5')
+model = tf.keras.models.load_model('example_cnn_lstm_music_genre_classifier.hdf5')
 print("Final accuracy on validations set:", 100*model.evaluate(x_test, y_test)[1], "%")
 print(labels)
 print("The confusion matrix is:")
