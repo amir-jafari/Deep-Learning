@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 
 # %% ----------------------------------- Hyper Parameters --------------------------------------------------------------
-# It is always good practice to set the hyper-parameters at the beginning of the script
+# It is always good practice to set the hyperparameters at the beginning of the script
 # And even better to define a params class if the script is long and complex
 LR = 2.5e-1
 N_NEURONS = 10
