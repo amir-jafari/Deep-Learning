@@ -3,12 +3,6 @@ import os
 import random
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.utils import to_categorical
-
 
 # %% --------------------------------------- Set-Up --------------------------------------------------------------------
 SEED = 42
@@ -25,23 +19,23 @@ BATCH_SIZE = 512
 DROPOUT = 0.2
 
 # %% -------------------------------------- Data Prep ------------------------------------------------------------------
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
 x_train, x_test = x_train.reshape(len(x_train), -1), x_test.reshape(len(x_test), -1)
-y_train, y_test = to_categorical(y_train, num_classes=10), to_categorical(y_test, num_classes=10)
+y_train, y_test = tf.keras.utils.to_categorical(y_train, num_classes=10), tf.keras.utils.to_categorical(y_test, num_classes=10)
 
 
 # %% -------------------------------------- Training Prep --------------------------------------------------------------
-class MLP(Model):
+class MLP(tf.keras.models.Model):
     # This model is equivalent to the one defined on 4_FuncionalAPI/example_MNIST.py
     # Notice we don't need to use the Input class nor the Add layer
     def __init__(self):
         super(MLP, self).__init__()
-        self.dense1 = Dense(N_NEURONS[0], activation='relu')
-        self.dense2 = Dense(784, activation='relu')
-        self.drop = Dropout(DROPOUT)
-        self.bn = BatchNormalization()
-        self.dense3 = Dense(N_NEURONS[1], activation="relu")
-        self.out = Dense(10, activation="softmax")
+        self.dense1 = tf.keras.layers.Dense(N_NEURONS[0], activation='relu')
+        self.dense2 = tf.keras.layers.Dense(784, activation='relu')
+        self.drop = tf.keras.layers.Dropout(DROPOUT)
+        self.bn = tf.keras.layers.BatchNormalization()
+        self.dense3 = tf.keras.layers.Dense(N_NEURONS[1], activation="relu")
+        self.out = tf.keras.layers.Dense(10, activation="softmax")
 
     def call(self, x):  # This method will be called inside model.fit()
         xx = self.drop(self.dense2(self.dense1(x)))
@@ -50,7 +44,7 @@ class MLP(Model):
 
 
 model = MLP()
-model.compile(optimizer=Adam(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
+model.compile(optimizer=tf.keras.optimizers.Adam(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
 
 # %% -------------------------------------- Training Loop ----------------------------------------------------------
 model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=N_EPOCHS, validation_data=(x_test, y_test))

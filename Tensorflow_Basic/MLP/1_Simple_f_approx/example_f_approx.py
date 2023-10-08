@@ -1,13 +1,10 @@
 # %% --------------------------------------- Imports -------------------------------------------------------------------
 import numpy as np
 import matplotlib.pyplot as plt
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Activation
-from tensorflow.keras.optimizers import SGD
-
+import tensorflow as tf
 
 # %% ----------------------------------- Hyper Parameters --------------------------------------------------------------
-# It is always good practice to set the hyper-parameters at the beginning of the script
+# It is always good practice to set the hyperparameters at the beginning of the script
 # And even better to define a params class if the script is long and complex
 LR = 0.1
 N_NEURONS = 10
@@ -20,13 +17,13 @@ t = np.exp(p) - np.sin(2*np.pi*p)  # (100,)
 
 # %% -------------------------------------- Training Prep --------------------------------------------------------------
 # Defines the model
-model = Sequential([
-    Dense(N_NEURONS, input_dim=1),  # Linear layer that maps 1 input dim to N_NEURONS hidden dim
-    Activation("sigmoid"),  # Sigmoid hidden transfer function
-    Dense(1)  # Maps N_NEURONS hidden dim to 1 output dim
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Dense(N_NEURONS, input_dim=1),  # Linear layer that maps 1 input dim to N_NEURONS hidden dim
+    tf.keras.layers.Activation("sigmoid"),  # Sigmoid hidden transfer function
+    tf.keras.layers.Dense(1)  # Maps N_NEURONS hidden dim to 1 output dim
 ])
 # Prepares a Stochastic Gradient Descent optimizer and a Mean Squared Error performance index
-model.compile(optimizer=SGD(lr=LR), loss="mean_squared_error")
+model.compile(optimizer=tf.keras.optimizers.SGD(lr=LR), loss="mean_squared_error")
 
 # %% -------------------------------------- Training Loop --------------------------------------------------------------
 # Trains the model. We use full Batch GD.

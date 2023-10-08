@@ -1,12 +1,8 @@
 # %% --------------------------------------- Imports -------------------------------------------------------------------
 import numpy as np
 import matplotlib.pyplot as plt
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Activation
-from tensorflow.keras.optimizers import Adam
+import tensorflow as tf
 from sklearn.metrics import accuracy_score
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.initializers import glorot_uniform
 
 # %% ----------------------------------- Hyper Parameters --------------------------------------------------------------
 LR = 0.2
@@ -27,17 +23,17 @@ def acc(x, y):
 p = np.array([[0, 0], [1, 1], [0, 1], [1, 0]])
 t = np.array([0, 0, 1, 1])
 # One-hot-encodes the targets to use the softmax and categorical cross-entropy performance index
-t = to_categorical(t, num_classes=2)
+t = tf.keras.utils.to_categorical(t, num_classes=2)
 
 # %% -------------------------------------- Training Prep --------------------------------------------------------------
-model = Sequential([
-    Dense(N_NEURONS, input_dim=2, kernel_initializer=glorot_uniform(42)),
-    Activation("sigmoid"),
-    Dense(2, kernel_initializer=glorot_uniform(42)),  # Output layer with softmax to map to the two classes
-    Activation("softmax")
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Dense(N_NEURONS, input_dim=2, kernel_initializer=tf.keras.initializers.glorot_uniform(42)),
+    tf.keras.layers.Activation("sigmoid"),
+    tf.keras.layers.Dense(2, kernel_initializer=tf.keras.initializers.glorot_uniform(42)),  # Output layer with softmax to map to the two classes
+    tf.keras.layers.Activation("softmax")
 ])
 # Compiles using categorical cross-entropy performance index and tracks the accuracy during training
-model.compile(optimizer=Adam(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
+model.compile(optimizer=tf.keras.optimizers.Adam(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
 
 # %% -------------------------------------- Training Loop --------------------------------------------------------------
 model.fit(p, t, batch_size=len(p), epochs=N_EPOCHS)

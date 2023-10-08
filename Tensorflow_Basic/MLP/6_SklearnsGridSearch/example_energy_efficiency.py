@@ -5,12 +5,11 @@ import random
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
-from tensorflow.keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
+# from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import GridSearchCV, KFold
+from sklearn.base import BaseEstimator, RegressorMixin
+# from tensorflow.keras.models import clone_model
 
 if "ENB2012_data.xlsx" not in os.listdir(os.getcwd()):
     try:
@@ -49,46 +48,57 @@ assert np.all(y.isna().sum() == 0), "There are missing target values"  # any nan
 x_train, x_test, y_train, y_test = train_test_split(x.values, y.values, test_size=0.3, random_state=SEED)
 
 
+
+
+class KerasRegressorWrapper(BaseEstimator, RegressorMixin):
+    def __init__(self, build_fn, **kwargs):
+        self.build_fn = build_fn
+        self.kwargs = kwargs
+        self.model = None
+
+    def fit(self, X, y):
+        self.model = self.build_fn(**self.kwargs)
+        self.model.fit(X, y)
+        return self
+
+    def predict(self, X):
+        return self.model.predict(X)
 # %% -------------------------------------- Training Prep --------------------------------------------------------------
 # Defines a function to return the compiled model for each set of hyper-parameters on the grid search
-def construct_model(dropout=0.3,
-                    activation='tanh',
-                    n_neurons=(100, 200, 100),
-                    lr=1e-3
-                    ):
-
-    mlp = Sequential([
-        Dense(n_neurons[0], input_dim=8, activation=activation),
-        Dropout(dropout),
-        BatchNormalization()
+def construct_model(activation='tanh', dropout=0.3, n_neurons=(100, 200, 100), lr=1e-3):
+    mlp = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(n_neurons[0], input_dim=8, activation=activation),
+        tf.keras.layers.Dropout(dropout),
+        tf.keras.layers.BatchNormalization()
     ])
     for neurons in n_neurons[1:]:
-        mlp.add(Dense(neurons, activation=activation))
-        mlp.add(Dropout(dropout, seed=SEED))
-        mlp.add(BatchNormalization())
-    mlp.add(Dense(2))  # We have two continious targets, so 2 neurons on output layer
-    mlp.compile(optimizer=Adam(lr=lr), loss="mean_squared_error")
-
+        mlp.add(tf.keras.layers.Dense(neurons, activation=activation))
+        mlp.add(tf.keras.layers.Dropout(dropout, seed=SEED))
+        mlp.add(tf.keras.layers.BatchNormalization())
+    mlp.add(tf.keras.layers.Dense(2))  # We have two continuous targets, so 2 neurons on the output layer
+    mlp.compile(optimizer=tf.keras.optimizers.Adam(lr=lr), loss="mean_squared_error")
     return mlp
 
 
+param_grid = {
+    'epochs': N_EPOCHS,
+    "batch_size": BATCH_SIZE,
+    'dropout': DROPOUT,
+    'n_neurons': N_NEURONS,
+    'lr': LR,
+    'activation': ACTIVATION  # Include 'activation' here
+}
 model = GridSearchCV(
-    estimator=KerasRegressor(
+    estimator=KerasRegressorWrapper(
         build_fn=construct_model
     ),
     scoring="r2",
-    param_grid={
-        'epochs': N_EPOCHS,  # The param grid must contain arguments of the usual Keras model.fit
-        "batch_size": BATCH_SIZE,  # and/or the arguments of the construct_model function
-        'dropout': DROPOUT,
-        "activation": ACTIVATION,
-        'n_neurons': N_NEURONS,
-        'lr': LR,
-    },
+    param_grid=param_grid,
     n_jobs=1,
     cv=KFold(n_splits=5, shuffle=True, random_state=SEED),
     verbose=10
 )
+
 
 # %% -------------------------------------- Training Loop ----------------------------------------------------------
 start = time()
