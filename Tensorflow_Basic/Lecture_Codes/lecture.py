@@ -1,5 +1,5 @@
 import tensorflow
-from tensorflow.keras import layers
+from keras import layers
 import numpy as np
 x = np.linspace(-4,4,500)
 y = np.sin(x)
@@ -13,7 +13,7 @@ model.compile(loss='mse',optimizer='sgd',metrics=['accuracy'])
 model.fit(x, y, epochs=10)
 # # %%---------------------------------------------------------------------------------------------
 import tensorflow
-from tensorflow.keras import layers
+from keras import layers
 import numpy as np
 x = np.linspace(-4,4,500)
 y = np.sin(x)
@@ -27,7 +27,7 @@ model.compile(loss='mse',optimizer='sgd',metrics=['accuracy'])
 model.fit(x, y, epochs=10)
 # %%---------------------------------------------------------------------------------------------
 import tensorflow
-from tensorflow.keras import layers
+from keras import layers
 import numpy as np
 x = np.linspace(-4,4,500).reshape(-1,1)
 y = np.sin(x)
@@ -50,10 +50,10 @@ model.compile(loss='mse',optimizer='sgd',metrics=['accuracy'])
 model.fit(x, y, epochs=10)
 # %%---------------------------------------------------------------------------------------------
 import tensorflow
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
-from tensorflow.keras.optimizers import RMSprop
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.optimizers import RMSprop
 
 batch_size = 128
 num_classes = 10

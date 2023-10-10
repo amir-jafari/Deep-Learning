@@ -4,14 +4,15 @@
 # Dr. Amir Jafari------>Email: amir.h.jafari@okstate.edu
 # %%%%%%%%%%%%% Date:
 # V1 Nov - 18 - 2017
+# V2 Oct - 10 - 2023
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # %%%%%%%%%%%%% Keras Examples %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # ==========================================================#
 import tensorflow
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout
-from tensorflow.keras.optimizers import RMSprop
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.optimizers import RMSprop
 
 batch_size = 128
 num_classes = 10
