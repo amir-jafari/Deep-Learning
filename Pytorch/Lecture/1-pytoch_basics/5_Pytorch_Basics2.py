@@ -28,7 +28,7 @@ data_iter = iter(train_loader)
 # Mini-batch images and labels.
 
 
-images, labels = data_iter.next()
+images, labels = next(data_iter)
 
 # Actual usage of data loader is as below.
 for images, labels in train_loader:

@@ -10,5 +10,5 @@ x1 =tf.keras.layers.Dense(10,activation='relu')(inputs)
 ouputs = tf.keras.layers.Dense(1, activation='relu')(x1)
 
 model = tf.keras.models.Model(inputs, ouputs)
-model.compile(loss='mse',optimizer='sgd',metrics=['accuracy'])
+model.compile(loss='mse',optimizer='adam',metrics=['accuracy'])
 model.fit(x, y, epochs=10)

@@ -116,7 +116,7 @@ for epoch in range(N_EPOCHS):
 
 # %% ------------------------------------------ Final Test -------------------------------------------------------------
 if PLOT_RESULT:
-    # Gets all of the predictions one last time
+    # Gets all the predictions one last time
     with torch.no_grad():
         h_state = torch.zeros(N_LAYERS, x_train.shape[1], HIDDEN_SIZE).float().to(device)
         c_state = torch.zeros(N_LAYERS, x_train.shape[1], HIDDEN_SIZE).float().to(device)
@@ -127,9 +127,11 @@ if PLOT_RESULT:
     # Stores only the last prediction using each sequence [:SEQ_LEN, 1:SEQ_LEN+1, ...] as inputs
     predictions_train, predictions_test = [], []
     for idx in range(pred_train.shape[1]):
-        predictions_train.append(pred_train[-1, idx].reshape(-1))
+        predictions_train.append(pred_train.cpu()[-1, idx].reshape(-1))
     for idx in range(pred_test.shape[1]):
-        predictions_test.append(pred_test[-1, idx].reshape(-1))
+        predictions_test.append(pred_test.cpu()[-1, idx].reshape(-1))
+    predictions_train = [np.array(x) for x in predictions_train]
+    predictions_test = [np.array(x) for x in predictions_test]
     # Plots the actual signal and the predicted signal using the previous SEQ_LEN points of the signal for each pred
     plt.plot(time_steps, x, label="Real Time Series", linewidth=2)
     plt.plot(time_steps[SEQ_LEN:len(predictions_train)+SEQ_LEN],

@@ -29,7 +29,7 @@ for index in range(500):
 
     loss = performance_index(a, t)
 
-    print(index, loss.data[0])
+    print(index, loss.item())
 
     optimizer.zero_grad()
 
