@@ -16,28 +16,23 @@ nltk.download('punkt')
 
 if "SST-2" not in os.listdir(os.getcwd()):
     try:
-        os.system("wget https://firebasestorage.googleapis.com/v0/b/mtl-sentence-representations.appspot.com/o/data%2FSST-2.zip?alt=media&token=aabc5f6b-e466-44a2-b9b4-cf6337f84ac8")
+        os.system("wget https://dl.fbaipublicfiles.com/glue/data/SST-2.zip")
         os.system("unzip SST-2.zip")
     except:
         print("There was a problem with the download!")
-        # Download the Stanford Sentiment Treebank from https://gluebenchmark.com/tasks and unzip it in the current working dir
-    if "SST-2" not in os.listdir(os.getcwd()):
-        print("There was a problem with the download!")
         import sys
+
         sys.exit()
+
 if "glove.6B.50d.txt" not in os.listdir(os.getcwd()):
     try:
-        os.system("wget http://nlp.stanford.edu/data/glove.6B.zip")
+        os.system("wget http://downloads.cs.stanford.edu/nlp/data/glove.6B.zip")
         os.system("unzip glove.6B.zip")
         os.system("mv glove.6B/glove.6B.50d.txt glove.6B.50d.txt")
         os.system("sudo rm -r glove.6B")
     except:
         print("There as a problem downloading the data!")
         raise
-    if "glove.6B.50d.txt" not in os.listdir(os.getcwd()):
-        print("There as a problem downloading the data!")
-        # Download glove.6B.zip from https://nlp.stanford.edu/projects/glove/, unzip it and move glove.6B.50d.txt to the
-        # current working directory.
 
 # %% --------------------------------------- Set-Up --------------------------------------------------------------------
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
