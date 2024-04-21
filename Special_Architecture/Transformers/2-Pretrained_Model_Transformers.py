@@ -5,34 +5,29 @@ import torchvision
 import torchvision.transforms as transforms
 from tqdm import tqdm
 from transformers import AutoModelForImageClassification, AutoConfig, AdamW
-
+# -------------------------------------------------------------------------------------------------------
 # Define transform to normalize data
 transform = transforms.Compose([
     transforms.Grayscale(num_output_channels=3),  # Convert images to RGB
     transforms.ToTensor(),
     transforms.Resize((224, 224))  # Resize images to match the expected input size of the model
 ])
-
-# Load Fashion MNIST dataset
+# -------------------------------------------------------------------------------------------------------
 trainset = torchvision.datasets.FashionMNIST(root='./data', train=True, download=True, transform=transform)
 testset = torchvision.datasets.FashionMNIST(root='./data', train=False, download=True, transform=transform)
 
 trainloader = torch.utils.data.DataLoader(trainset, batch_size=64, shuffle=True)
 testloader = torch.utils.data.DataLoader(testset, batch_size=64, shuffle=False)
-
-# Load pre-trained Vision Transformer model
+# -------------------------------------------------------------------------------------------------------
 model_name = "google/vit-base-patch16-224-in21k"
-config = AutoConfig.from_pretrained(model_name,
-                                    num_labels=10)  # Change num_labels to match the number of classes in Fashion MNIST
+config = AutoConfig.from_pretrained(model_name,num_labels=10)
 model = AutoModelForImageClassification.from_pretrained(model_name, config=config)
-
-# Define loss function and optimizer
+# -------------------------------------------------------------------------------------------------------
 criterion = nn.CrossEntropyLoss()
 optimizer = AdamW(model.parameters(), lr=1e-5)
-
-# Train the model
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.to(device)
+# -------------------------------------------------------------------------------------------------------
 
 num_epochs = 5
 for epoch in range(num_epochs):
@@ -51,6 +46,7 @@ for epoch in range(num_epochs):
         running_loss += loss.item()
 
     print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {running_loss / len(trainloader)}")
+# -------------------------------------------------------------------------------------------------------
 
 # Test the model
 model.eval()
