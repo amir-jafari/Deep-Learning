@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
+# ----------------------------------------------------------------------------------------------------------------------
 # Define the CNN Model
 class CNN(nn.Module):
     def __init__(self):
@@ -17,6 +17,7 @@ class CNN(nn.Module):
         x = x.view(-1, 64 * 7 * 7)
         x = nn.functional.relu(self.fc1(x))
         return x
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Define the LSTM Model
 class LSTM(nn.Module):
@@ -33,6 +34,7 @@ class LSTM(nn.Module):
         out, _ = self.lstm(x, (h0, c0))
         out = self.fc(out[:, -1, :])
         return out
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Define the CNN+LSTM Model
 class CNN_LSTM(nn.Module):
@@ -46,6 +48,7 @@ class CNN_LSTM(nn.Module):
         x = x.unsqueeze(1)
         x = self.lstm(x)
         return x
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Create an instance of the CNN_LSTM model
 model = CNN_LSTM(input_size=1, hidden_size=128, num_layers=2, output_size=10)
@@ -53,10 +56,12 @@ model = CNN_LSTM(input_size=1, hidden_size=128, num_layers=2, output_size=10)
 # Dummy input data
 input_data = torch.randn(32, 1, 28, 28)  # Batch size of 32, 1 channel, 28x28 images
 target = torch.randint(0, 10, (32,))  # Dummy target labels
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Define loss function and optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
+# ----------------------------------------------------------------------------------------------------------------------
 
 # Training loop
 epochs = 5
