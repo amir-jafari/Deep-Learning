@@ -55,12 +55,13 @@ n_classes = len(np.unique(y_train))
 
 # %% ---------------------------------- Hyperparameters ----------------------------------------------------------------
 
-optimizer = Adam(lr=0.0002, beta_1=0.5, beta_2=0.9)
+discriminator_optimizer = Adam(lr=0.0002, beta_1=0.5, beta_2=0.9)
+generator_optimizer = Adam(lr=0.0002, beta_1=0.5, beta_2=0.9)  #
 latent_dim = 32
 
 # %% ---------------------------------- Models Setup -------------------------------------------------------------------
 # Build Generator
-def generator_fc():
+def generator_fc(generator_optimizer):
     noise = Input(shape=(latent_dim,))
     x = Dense(128, kernel_initializer=weight_init)(noise)
     x = BatchNormalization()(x)
@@ -76,7 +77,7 @@ def generator_fc():
     model = Model(inputs=noise, outputs=out)
     return model
 
-def discriminator_fc():
+def discriminator_fc(discriminator_optimizer):
     img = Input(shape=img_size)
     x = Flatten()(img)
     x = Dense(512, kernel_initializer=weight_init)(x)
@@ -88,7 +89,7 @@ def discriminator_fc():
     out = Dense(1, activation='sigmoid', kernel_initializer=weight_init)(x)
 
     model = Model(inputs=img, outputs=out)
-    model.compile(optimizer=optimizer, loss='binary_crossentropy', metrics=['accuracy'])
+    model.compile(optimizer=discriminator_optimizer, loss='binary_crossentropy', metrics=['accuracy'])
     return model
 
 def generator_trainer(generator, discriminator):
@@ -98,7 +99,7 @@ def generator_trainer(generator, discriminator):
     model = Sequential()
     model.add(generator)
     model.add(discriminator)
-    model.compile(optimizer=optimizer, loss='binary_crossentropy')
+    model.compile(optimizer=generator_optimizer, loss='binary_crossentropy')
 
     return model
 
@@ -109,7 +110,7 @@ class GAN:
     def __init__(self, g_model, d_model):
         self.img_size = img_size  # channel_last
         self.z = latent_dim
-        self.optimizer = optimizer
+
 
         self.generator = g_model
         self.discriminator = d_model
@@ -148,8 +149,9 @@ class GAN:
 
 
 # %% ----------------------------------- Compile Models ----------------------------------------------------------------
-d_model = discriminator_fc()
-g_model = generator_fc()
+d_model = discriminator_fc(discriminator_optimizer)
+g_model = generator_fc(generator_optimizer)
+
 
 gan = GAN(g_model=g_model, d_model=d_model)
 
