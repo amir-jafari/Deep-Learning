@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 p = np.linspace(-2, 2, 100)
 t = np.sin(np.pi*p)
 
-inputs = tf.keras.Input(shape=(1))
+inputs = tf.keras.Input(shape=(1,))
 x = tf.keras.layers.Dense(10, activation='relu')(inputs)
 predictions = tf.keras.layers.Dense(1)(x)
 
