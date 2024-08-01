@@ -8,7 +8,7 @@ t = tf.reshape(tf.convert_to_tensor(t), (-1, 1))
 class MyModel(tf.keras.Model):
   def __init__(self):
     super(MyModel, self).__init__()
-    inputs = tf.keras.Input(shape=(1))
+    inputs = tf.keras.Input(shape=(1,))
     self.x1 = tf.keras.layers.Dense(512, activation='tanh', name='d1')
     self.predictions = tf.keras.layers.Dense(1, name='d2')
 
