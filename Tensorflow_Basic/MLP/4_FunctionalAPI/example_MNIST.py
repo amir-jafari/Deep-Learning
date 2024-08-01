@@ -40,7 +40,7 @@ x = tf.keras.layers.Dropout(DROPOUT)(x)
 probs = tf.keras.layers.Dense(10, activation="softmax")(x)
 # Gets an instance of Model class based on inputs and probs, which has kept track of all the operations in-between
 model = tf.keras.models.Model(inputs=inputs, outputs=probs)
-model.compile(optimizer=tf.keras.optimizers.Adam(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=LR), loss="categorical_crossentropy", metrics=["accuracy"])
 
 # %% -------------------------------------- Training Loop ----------------------------------------------------------
 model.fit(x_train, y_train, batch_size=BATCH_SIZE, epochs=N_EPOCHS, validation_data=(x_test, y_test))

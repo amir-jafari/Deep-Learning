@@ -49,7 +49,7 @@ for n_neurons in N_NEURONS[1:]:
     model.add(tf.keras.layers.BatchNormalization())
 # Adds a final output layer with softmax to map to the 10 classes
 model.add(tf.keras.layers.Dense(10, activation="softmax", kernel_initializer=weight_init))
-model.compile(optimizer=tf.keras.optimizers.Adam(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=LR), loss="categorical_crossentropy", metrics=["accuracy"])
 
 # %% -------------------------------------- Training Loop ----------------------------------------------------------
 # Trains the MLP, while printing validation loss and metrics at each epoch
