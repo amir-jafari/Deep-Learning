@@ -1,65 +1,45 @@
+import torchvision
+
 import torch
 import numpy as np
 import torch.utils.data as data
 import torchvision.transforms as transforms
 import torchvision.datasets as dsets
+import matplotlib.pyplot as plt
+import torchvision.utils as vutils
 
+# Define CIFAR-10 class names
+cifar10_classes = ['airplane', 'automobile', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
 
-# ======================== Loading data from numpy ========================#
-a = np.array([[1, 2], [3, 4]])
-b = torch.from_numpy(a)
-c = b.numpy()
+# Define transformation for the dataset
+transform = transforms.Compose([
+    transforms.ToTensor(),  # Convert PIL image to tensor
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))  # Normalize images
+])
 
-# ===================== Implementing the input pipline =====================#
-# Download and construct dataset.
-train_dataset = dsets.CIFAR10(root='../data/', train=True, transform=transforms.ToTensor(), download=True)
+# Download and construct dataset
+train_dataset = dsets.CIFAR10(root='./data', train=True, transform=transform, download=True)
+test_dataset = dsets.CIFAR10(root='./data', train=False, transform=transform, download=True)
 
-# Select one data pair (read data from disk).
-image, label = train_dataset[0]
-print(image.size())
-print(label)
+# Data Loader (provides queue and thread in a very simple way)
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=100, shuffle=True, num_workers=2)
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=100, shuffle=False, num_workers=2)
 
-# Data Loader (this provides queue and thread in a very simple way).
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=100, shuffle=True,num_workers=2)
-
-# When iteration starts, queue and thread start to load dataset from files.
+# Iterate through the DataLoader
 data_iter = iter(train_loader)
-
-# Mini-batch images and labels.
-
-
 images, labels = next(data_iter)
 
-# Actual usage of data loader is as below.
-for images, labels in train_loader:
-    # Your training code will be written here
-    pass
+# Print shape of images and labels
+print("Image batch dimensions:", images.size())
+print("Label batch dimensions:", labels.size())
 
+# Plot a few images from the dataset
+def imshow(img):
+    img = img / 2 + 0.5  # unnormalize
+    npimg = img.numpy()
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.show()
 
-# ===================== Input pipline for custom dataset =====================#
-# You should build custom dataset as below.
-class CustomDataset(data.Dataset):
-    def __init__(self):
-        # TODO
-        # 1. Initialize file path or list of file names.
-        pass
-
-    def __getitem__(self, index):
-        # TODO
-        # 1. Read one data from file (e.g. using numpy.fromfile, PIL.Image.open).
-        # 2. Preprocess the data (e.g. torchvision.Transform).
-        # 3. Return a data pair (e.g. image and label).
-        pass
-
-    def __len__(self):
-        # You should change 0 to the total size of your dataset.
-        return 0
-
-        # Then, you can just use prebuilt torch's data loader.
-
-
-custom_dataset = CustomDataset()
-train_loader = torch.utils.data.DataLoader(dataset=custom_dataset,
-                                           batch_size=100,
-                                           shuffle=True,
-                                           num_workers=2)
+# Show a batch of images
+imshow(vutils.make_grid(images))
+print(' '.join(f'{cifar10_classes[labels[j]]:5s}' for j in range(4)))
