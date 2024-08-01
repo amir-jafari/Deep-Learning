@@ -33,7 +33,7 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Activation("softmax")
 ])
 # Compiles using categorical cross-entropy performance index and tracks the accuracy during training
-model.compile(optimizer=tf.keras.optimizers.Adam(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=LR), loss="categorical_crossentropy", metrics=["accuracy"])
 
 # %% -------------------------------------- Training Loop --------------------------------------------------------------
 model.fit(p, t, batch_size=len(p), epochs=N_EPOCHS)
