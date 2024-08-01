@@ -130,7 +130,7 @@ for epoch in range(N_EPOCHS):
 
     print("Epoch {} | Train Loss {:.5f}, Train Acc {:.2f} - Test Loss {:.5f}, Test Acc {:.2f}".format(
         epoch, train_loss.result(), train_accuracy.result()*100, test_loss.result(), test_accuracy.result()*100))
-    train_loss.reset_states(); train_accuracy.reset_states(); test_loss.reset_states(); test_accuracy.reset_states()
+    train_loss.reset_state(); train_accuracy.reset_state(); test_loss.reset_state(); test_accuracy.reset_state()
 
 # %% ------------------------------------------- Final Test ------------------------------------------------------------
 # Performs the final test on the CPU
