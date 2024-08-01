@@ -28,13 +28,14 @@ def change_image_shape(images):
     elif shape_tuple == 4 and shape_tuple[-1] > 3:
         images = images.reshape(-1, shape_tuple[-1], shape_tuple[-1], shape_tuple[1])
     return images
+
 ######################## MNIST / CIFAR ##########################
-# # Load MNIST Fashion
+# Load MNIST Fashion
 from tensorflow.keras.datasets.fashion_mnist import load_data
-# # Load CIFAR-10
+# Load CIFAR-10
 # from tensorflow.keras.datasets.cifar10 import load_data
 
-# # Load training set
+# Load training set
 (x_train, y_train), (x_test, y_test) = load_data()
 x_train, x_test = change_image_shape(x_train), change_image_shape(x_test)
 y_train, y_test = y_train.reshape(-1), y_test.reshape(-1)
@@ -55,8 +56,8 @@ n_classes = len(np.unique(y_train))
 
 # %% ---------------------------------- Hyperparameters ----------------------------------------------------------------
 
-discriminator_optimizer = Adam(lr=0.0002, beta_1=0.5, beta_2=0.9)
-generator_optimizer = Adam(lr=0.0002, beta_1=0.5, beta_2=0.9)  #
+discriminator_optimizer = Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
+generator_optimizer = Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)  #
 latent_dim = 32
 
 # %% ---------------------------------- Models Setup -------------------------------------------------------------------
@@ -103,14 +104,12 @@ def generator_trainer(generator, discriminator):
 
     return model
 
-
 # %% ----------------------------------- GAN Part ----------------------------------------------------------------------
 # Build our GAN
 class GAN:
     def __init__(self, g_model, d_model):
         self.img_size = img_size  # channel_last
         self.z = latent_dim
-
 
         self.generator = g_model
         self.discriminator = d_model
@@ -120,7 +119,7 @@ class GAN:
 
     def train(self, imgs, steps_per_epoch=50, batch_size=128):
         # load data
-        bs_half = batch_size//2
+        bs_half = batch_size // 2
 
         for epoch in range(steps_per_epoch):
             # Get a half batch of random real images
@@ -132,26 +131,24 @@ class GAN:
             fake_img = self.generator.predict(noise)
 
             # Train the discriminator
-            loss_fake = self.discriminator.train_on_batch(fake_img, np.zeros(bs_half))
-            loss_real = self.discriminator.train_on_batch(real_img, np.ones(bs_half))
-            self.loss_D.append(0.5 * np.add(loss_fake, loss_real))
+            loss_fake = self.discriminator.train_on_batch(fake_img, np.zeros((bs_half, 1)))
+            loss_real = self.discriminator.train_on_batch(real_img, np.ones((bs_half, 1)))
+            self.loss_D.append(0.5 * (loss_fake[0] + loss_real[0]))  # Assuming loss is at index 0
 
             # Train the generator
             noise = np.random.normal(0, 1, size=(batch_size, latent_dim))
-            loss_gen = self.train_gen.train_on_batch(noise, np.ones(batch_size))
-            self.loss_G.append(loss_gen)
+            loss_gen = self.train_gen.train_on_batch(noise, np.ones((batch_size, 1)))
+            self.loss_G.append(loss_gen[0])  # Assuming loss is at index 0
 
-            if (epoch + 1) * 10 % steps_per_epoch == 0:
+            if (epoch + 1) % (steps_per_epoch // 10) == 0:
                 print('Steps (%d / %d): [Loss_D_real: %f, Loss_D_fake: %f, acc: %.2f%%] [Loss_G: %f]' %
-                  (epoch+1, steps_per_epoch, loss_real[0], loss_fake[0], 100*self.loss_D[-1][1], loss_gen))
+                      (epoch + 1, steps_per_epoch, loss_real[0], loss_fake[0], 100 * self.loss_D[-1], loss_gen[0]))
 
         return
-
 
 # %% ----------------------------------- Compile Models ----------------------------------------------------------------
 d_model = discriminator_fc(discriminator_optimizer)
 g_model = generator_fc(generator_optimizer)
-
 
 gan = GAN(g_model=g_model, d_model=d_model)
 
@@ -197,12 +194,12 @@ EPOCHS = 100
 for epoch in range(EPOCHS):
     print('EPOCH # ', epoch + 1, '-' * 50)
     gan.train(x_train, steps_per_epoch=50, batch_size=128)
-    if (epoch+1)%1 == 0:
+    if (epoch + 1) % 1 == 0:
         plt_img(gan.generator)
 
 ############################# Display performance #############################
 # plot loss of G and D
-plt.plot(np.array(gan.loss_D).T[0], label='D')
+plt.plot(np.array(gan.loss_D), label='D')
 plt.plot(np.array(gan.loss_G), label='G')
 plt.legend()
 plt.show()
