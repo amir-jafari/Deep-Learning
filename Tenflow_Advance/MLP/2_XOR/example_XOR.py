@@ -60,7 +60,7 @@ for epoch in range(N_EPOCHS):
     train()
     if epoch % PRINT_LOSS_EVERY == 0:
         print("Epoch {} | Loss {:.5f}".format(epoch, train_loss.result()))
-    train_loss.reset_states()  # Resets the metric for the next epoch
+    train_loss.reset_state()  # Resets the metric for the next epoch
 
 # %% -------------------------------------- Check Approx ---------------------------------------------------------------
 print(accuracy_score(t.numpy(), tf.argmax(model(p), axis=1).numpy())*100)
