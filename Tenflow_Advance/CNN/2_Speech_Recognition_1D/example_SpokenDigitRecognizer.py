@@ -29,7 +29,7 @@ DATA_PATH = os.getcwd() + "/free-spoken-digit-dataset-master/recordings/"
 DATA_PATH_TRAIN = os.getcwd() + "/train_data/"
 DATA_PATH_TEST = os.getcwd() + "/test_data/"
 TRAIN = True
-SAVE_MODEL = False
+SAVE_MODEL = True
 SAVE_MODEL_PATH = "example_saved_model/"
 
 # %% ----------------------------------- Hyper Parameters --------------------------------------------------------------
@@ -124,7 +124,8 @@ if TRAIN:
 
     train_loss = tf.keras.metrics.Mean(name='train_loss')
     train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
-    # @tf.function
+
+    @tf.function
     def train(x, y):
         model.training = True
         with tf.GradientTape() as tape:
@@ -137,7 +138,8 @@ if TRAIN:
 
     test_loss = tf.keras.metrics.Mean(name='test_loss')
     test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
-    # @tf.function
+
+    @tf.function
     def eval(x, y):
         model.training = False
         logits = model(tf.dtypes.cast(tf.convert_to_tensor(x), tf.float32))
@@ -164,18 +166,17 @@ if TRAIN:
             epoch, train_loss.result(), train_accuracy.result()*100, test_loss.result(), test_accuracy.result()*100))
 
         if test_loss.result().numpy() < loss_test_best and SAVE_MODEL:
-            model_path = SAVE_MODEL_PATH + "cnn_spoken_digit_recognizer"
-            model.save_weights(model_path, save_format='tf')
+            model_path = SAVE_MODEL_PATH + "cnn_spoken_digit_recognizer.keras"  # Use .keras extension
+            model.save(model_path)  # Save model in .keras format
             print("The model has been saved!")
             loss_test_best = test_loss.result().numpy()
 
-        train_loss.reset_states(); train_accuracy.reset_states(); test_loss.reset_states(); test_accuracy.reset_states()
+        train_loss.reset_state(); train_accuracy.reset_state(); test_loss.reset_state(); test_accuracy.reset_state()
 
 # %% ----------------------------------------- Final Test --------------------------------------------------------------
-model_path = SAVE_MODEL_PATH + "cnn_spoken_digit_recognizer"
-model.load_weights(model_path)
-model.training = False
-y_test_pred = tf.argmax(model(x_test), axis=1).numpy()
-print("The accuracy on the test set is", 100*accuracy_score(y_test.numpy(), y_test_pred), "%")
-print("The confusion matrix is")
-print(confusion_matrix(y_test.numpy(), y_test_pred))
+if not TRAIN:
+    model_path = SAVE_MODEL_PATH + "cnn_spoken_digit_recognizer.keras"  # Use .keras extension
+    model = tf.keras.models.load_model(model_path)  # Load model from .keras format
+    model.training = False
+    y_test_pred = tf.argmax(model(x_test), axis=1).numpy()
+    print("The accuracy on the test set is", 100*accuracy_score(y_test.numpy(), y_test_pred.numpy()))
