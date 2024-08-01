@@ -61,26 +61,25 @@ del x_train_prep, y_train_prep, x_test_prep, y_test_prep
 
 # %% -------------------------------------- Training Prep ----------------------------------------------------------
 if HIDDEN_SIZE is None:  # This layer takes an input of (batch_size, timesteps, input_dim).
-    # In theory this should be enough (see PyTorch version) because the output function is a tanh and our signal is on
-    # the interval [-1, 1]. Not sure why it's only learning half the signal...
-    # Could it be due to some Keras internals regarding this function and the LSTM layer?
-    model = tf.keras.models.Sequential([tf.keras.layers.LSTM(units=1, dropout=DROPOUT, stateful=STATEFUL,
-                             batch_input_shape=(BATCH_SIZE, SEQ_LEN, 1) if STATEFUL else None,
-                             return_sequences=True if LOSS_WHOLE_SEQ else False)])
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.LSTM(
+            units=1,
+            dropout=DROPOUT,
+            stateful=STATEFUL,
+            return_sequences=True if LOSS_WHOLE_SEQ else False
+        )
+    ])
 else:  # stateful=True means that it will take the hidden states of the previous batch as memory for the current batch
-    # This is equivalent to passing the h_c_states as additional inputs in the PyTorch code.
-    # Note that we need a constant batch_size in this case, but we cannot just drop the last batch as in PyTorch, so we
-    # need to specify a batch_size such that both len(x_train) and len(x_test) are divisible by.
-    model = tf.keras.models.Sequential([tf.keras.layers.LSTM(units=HIDDEN_SIZE, dropout=DROPOUT, stateful=STATEFUL,
-                             batch_input_shape=(BATCH_SIZE, SEQ_LEN, 1) if STATEFUL else None,
-                             return_sequences=True if LOSS_WHOLE_SEQ else False),
-                        tf.keras.layers.Dense(1, activation="linear")])
-    # return_sequences=True means that all the intermediate outputs of the LSTM will be returned, and thus the network
-    # will be trained to take 1 previous time step as input and predict the next time step, but also to take 2
-    # previous time steps as inputs and predict the next time step, and also 3, 4, ..., SEQ_LENGTH previous t_steps.
-    # If False, only the last output will be returned. This means that the network will being trained specifically to
-    # take SEQ_LENGTH previous time steps as inputs and predict the next time step.
-model.compile(optimizer=tf.keras.optimizers.Adam(lr=LR), loss="mean_squared_error")
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.LSTM(
+            units=HIDDEN_SIZE,
+            dropout=DROPOUT,
+            stateful=STATEFUL,
+            return_sequences=True if LOSS_WHOLE_SEQ else False
+        ),
+        tf.keras.layers.Dense(1, activation="linear")
+    ])
+model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=LR), loss="mean_squared_error")
 
 # %% -------------------------------------- Training Loop ----------------------------------------------------------
 print("Starting training loop...")
