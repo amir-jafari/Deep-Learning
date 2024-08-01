@@ -23,7 +23,7 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Dense(1)  # Maps N_NEURONS hidden dim to 1 output dim
 ])
 # Prepares a Stochastic Gradient Descent optimizer and a Mean Squared Error performance index
-model.compile(optimizer=tf.keras.optimizers.SGD(lr=LR), loss="mean_squared_error")
+model.compile(optimizer=tf.keras.optimizers.SGD(learning_rate=LR), loss="mean_squared_error")
 
 # %% -------------------------------------- Training Loop --------------------------------------------------------------
 # Trains the model. We use full Batch GD.

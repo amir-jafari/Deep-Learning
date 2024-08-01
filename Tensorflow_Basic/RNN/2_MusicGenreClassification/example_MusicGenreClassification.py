@@ -2,31 +2,20 @@
 import os
 import random
 import numpy as np
+import torch
+import torchaudio
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
-from scipy.io import wavfile
 from sklearn.metrics import confusion_matrix
-
-if "genres" not in os.listdir(os.getcwd()):
-    try:
-        os.system("wget http://opihi.cs.uvic.ca/sound/genres.tar.gz")
-        os.system("tar -xvzf genres.tar.gz")
-    except:
-        print("There was an error trying to download the data!")
-        raise
-        # Go to http://marsyas.info/downloads/datasets.html and Download the GTZAN genre collection (Approximately 1.2GB)
-    if "genres" not in os.listdir(os.getcwd()):
-        print("There was an error trying to download the data!")
-        import sys
-        sys.exit()
 
 # %% --------------------------------------- Set-Up --------------------------------------------------------------------
 SEED = 42
 os.environ['PYTHONHASHSEED'] = str(SEED)
 random.seed(SEED)
 np.random.seed(SEED)
+torch.manual_seed(SEED)
 tf.random.set_seed(SEED)
-DATA_PATH = "/genres"
+DATA_PATH = os.getcwd()# This should be updated to the location where GTZAN is stored
 
 # %% ----------------------------------- Hyper Parameters --------------------------------------------------------------
 LR = 1e-3
@@ -35,40 +24,36 @@ BATCH_SIZE = 16
 DROPOUT = 0.5
 SEQ_LEN = 10  # seconds
 HIDDEN_SIZES = [256, 128]
+SAMPLE_RATE = 22050
+
 
 # %% ----------------------------------- Helper Functions --------------------------------------------------------------
-def get_max_length():
-    max_length = 0
-    for subdir in [f for f in os.listdir(os.getcwd() + DATA_PATH) if os.path.isdir(os.getcwd() + DATA_PATH + "/" + f)]:
-        for file in os.listdir(os.getcwd() + DATA_PATH + "/" + subdir):
-            _, example = wavfile.read(os.getcwd() + DATA_PATH + "/" + subdir + "/" + file)
-            if len(example) > max_length:
-                max_length = len(example)
-    return max_length
-
 def load_data():
-    x, y, label, label_dict = [], [], 0, {}
-    for subdir in [f for f in os.listdir(os.getcwd() + DATA_PATH) if os.path.isdir(os.getcwd() + DATA_PATH + "/" + f)]:
-        label_dict[subdir] = label
-        for file in os.listdir(os.getcwd() + DATA_PATH + "/" + subdir):
-            _, example = wavfile.read(os.getcwd() + DATA_PATH + "/" + subdir + "/" + file)
-            if len(example) > 22050*SEQ_LEN:  # Trims from the beginning to max_seq_length
-                example = example[:22050*SEQ_LEN]  # 22050 is the sampling frequency (22050 samples per second)
-            else:  # Pads up to the max_seq_length
-                example = np.hstack((example, np.zeros((22050*SEQ_LEN - len(example)))))
-            x.append(example)
-            y.append(label)
-        label += 1
-    return np.array(x), np.array(y), label_dict
+    dataset = torchaudio.datasets.GTZAN(root=DATA_PATH, download=True)
+    x, y = [], []
+    for waveform, label in dataset:
+        waveform = waveform.mean(dim=0)  # Convert to mono
+        waveform = waveform.numpy()
+        length = waveform.shape[0]
+        target_length = SAMPLE_RATE * SEQ_LEN
+
+        if length > target_length:
+            waveform = waveform[:target_length]  # Trim
+        else:
+            waveform = np.pad(waveform, (0, target_length - length))  # Pad
+
+        x.append(waveform)
+        y.append(label)
+
+    return np.array(x), np.array(y)
+
 
 # %% -------------------------------------- Data Prep ------------------------------------------------------------------
-if SEQ_LEN == "get_max_from_data":
-    SEQ_LEN = get_max_length()//22050  # In seconds
-x, y, labels = load_data()
+x, y = load_data()
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=SEED, stratify=y)
-# Reshapes to (batch_size, timesteps, input_dim). We have only one channel (input_dim) due to mono audio files
 x_train, x_test = x_train.reshape(len(x_train), -1, 1), x_test.reshape(len(x_test), -1, 1)
-y_train, y_test = tf.keras.utils.to_categorical(y_train, num_classes=10), tf.keras.utils.to_categorical(y_test, num_classes=10)
+y_train, y_test = tf.keras.utils.to_categorical(y_train, num_classes=10), tf.keras.utils.to_categorical(y_test,
+                                                                                                        num_classes=10)
 
 # %% -------------------------------------- Training Prep ----------------------------------------------------------
 model1 = tf.keras.models.Sequential([
@@ -90,23 +75,24 @@ model1 = tf.keras.models.Sequential([
     tf.keras.layers.Conv1D(256, 3, activation="relu"),
     tf.keras.layers.MaxPooling1D(4),
     tf.keras.layers.BatchNormalization(),
-    # MaxPooling1D(4),
 ])
 HIDDEN_SIZES[0] = 256
-for hidden_size in HIDDEN_SIZES[:-1]:  # If we want more than one LSTM layer, we need to return the sequences on all the layers
-    model1.add(tf.keras.layers.LSTM(units=hidden_size, dropout=DROPOUT, recurrent_dropout=DROPOUT, return_sequences=True))  # except for the last one
+for hidden_size in HIDDEN_SIZES[:-1]:
+    model1.add(
+        tf.keras.layers.LSTM(units=hidden_size, dropout=DROPOUT, recurrent_dropout=DROPOUT, return_sequences=True))
 model1.add(tf.keras.layers.LSTM(units=HIDDEN_SIZES[-1], dropout=DROPOUT, recurrent_dropout=DROPOUT))
 model1.add(tf.keras.layers.Dense(10, activation="softmax"))
 model1.compile(optimizer=tf.keras.optimizers.RMSprop(lr=LR), loss="categorical_crossentropy", metrics=["accuracy"])
 
 # %% -------------------------------------- Training Loop ----------------------------------------------------------
 print("Starting training loop...")
-model1.fit(tf.cast(x_train,tf.float32), tf.cast(y_train,tf.float32), batch_size=BATCH_SIZE, epochs=N_EPOCHS, validation_data=(tf.cast(x_test,tf.float32), tf.cast(y_test,tf.float32)),
-           callbacks=[tf.keras.callbacks.ModelCheckpoint("example_cnn_lstm_music_genre_classifier.hdf5", monitor="val_accuracy", save_best_only=True)])
+model1.fit(tf.cast(x_train, tf.float32), tf.cast(y_train, tf.float32), batch_size=BATCH_SIZE, epochs=N_EPOCHS,
+           validation_data=(tf.cast(x_test, tf.float32), tf.cast(y_test, tf.float32)),
+           callbacks=[tf.keras.callbacks.ModelCheckpoint("example_cnn_lstm_music_genre_classifier.hdf5",
+                                                         monitor="val_accuracy", save_best_only=True)])
 
 # %% ------------------------------------------ Final Test -------------------------------------------------------------
 model = tf.keras.models.load_model('example_cnn_lstm_music_genre_classifier.hdf5')
-print("Final accuracy on validations set:", 100*model.evaluate(x_test, y_test)[1], "%")
-print(labels)
-print("The confusion matrix is:")
+print("Final accuracy on validation set:", 100 * model.evaluate(x_test, y_test)[1], "%")
+print("Confusion Matrix:")
 print(confusion_matrix(np.argmax(y_test, axis=1), np.argmax(model.predict(x_test), axis=1)))
