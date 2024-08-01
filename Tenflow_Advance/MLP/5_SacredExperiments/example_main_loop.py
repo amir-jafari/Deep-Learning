@@ -120,7 +120,7 @@ def my_main(random_seed, lr, neurons_per_layer, n_epochs, batch_size, dropout):
 
         # Only saves the model if it's better than the models from all of the other experiments
         if test_loss.result().numpy() < loss_test_best:
-            tf.saved_model.save(model, os.getcwd() + '/example_mlp_mnist/')
+            model.save(os.getcwd() + '/example_mlp_mnist.keras')
             print("A new model has been saved!")
             loss_test_best = test_loss.result().numpy()
         if test_loss.result().numpy() < loss_best:
@@ -134,4 +134,4 @@ def my_main(random_seed, lr, neurons_per_layer, n_epochs, batch_size, dropout):
         # To save the best results of this run to info.json. This is used by get_results() to generate the spreadsheet
         ex.info["epoch"], ex.info["test loss"], ex.info["test acc"] = best_epoch, loss_best, acc_best
 
-        train_loss.reset_states(); train_accuracy.reset_states(); test_loss.reset_states(); test_accuracy.reset_states()
+        train_loss.reset_state(); train_accuracy.reset_state(); test_loss.reset_state(); test_accuracy.reset_state()
