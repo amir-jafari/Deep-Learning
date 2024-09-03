@@ -31,53 +31,7 @@ print(device)
 # Codeblock 4
 class PatcherUnfold(nn.Module):
     """
-    This is the documentation for the PatcherUnfold class.
 
-    Class: PatcherUnfold(nn.Module)
-
-    Description:
-        The PatcherUnfold class is a module for unfolding an input tensor into patches, performing linear projection on the patches, and returning the transformed patches.
-
-    Attributes:
-        - unfold: nn.Unfold
-            Object that unfolds the input tensor into patches based on kernel_size and stride.
-        - linear_projection: nn.Linear
-            Object that performs linear projection on the unfolded patches.
-
-    Methods:
-        - __init__()
-            Constructor method that initializes the PatcherUnfold class.
-
-        - forward(x)
-            Method that performs the forward pass of the PatcherUnfold class.
-
-    Note:
-        - This class inherits from the nn.Module class.
-
-    Method Details:
-        1. __init__()
-
-            Description:
-                Initializes the PatcherUnfold class by defining the unfold and linear_projection attributes.
-
-            Parameters:
-                None
-
-            Returns:
-                None
-
-        2. forward(x)
-
-            Description:
-                Performs the forward pass of the PatcherUnfold class by applying the unfolding, permuting, and linear projection operations.
-
-            Parameters:
-                - x: torch.Tensor
-                    Input tensor to be transformed.
-
-            Returns:
-                torch.Tensor
-                    Transformed tensor after unfolding and linear projection operations.
     """
     def __init__(self):
         super().__init__()
@@ -107,39 +61,7 @@ x = patcher_unfold(x)
 # Codeblock 7
 class PatcherConv(nn.Module):
     """
-    This module provides the implementation of the PatcherConv class, which is a PyTorch module for patch-based convolution operations.
 
-    PatcherConv Class:
-        This class extends the nn.Module class from the PyTorch library. It performs patch-based convolution operations on the input tensor.
-
-    Constructor:
-        def __init__(self)
-            Initializes an instance of the PatcherConv class.
-
-            Parameters:
-                None
-
-            Returns:
-                None
-
-    Attributes:
-        conv: nn.Conv2d
-            A convolutional layer that applies patch-based convolution to the input tensor.
-
-        flatten: nn.Flatten
-            A flatten layer that flattens the output tensor after the convolution operation.
-
-    Methods:
-        forward(self, x)
-            Performs the forward pass of the PatcherConv module.
-
-            Parameters:
-                x: torch.Tensor
-                    The input tensor of shape [batch_size, channels, height, width].
-
-            Returns:
-                torch.Tensor
-                    The output tensor of shape [batch_size, num_patches, embedding_dim].
     """
     def __init__(self):
         super().__init__()
@@ -172,20 +94,7 @@ x = patcher_conv(x)
 # Codeblock 9
 class PosEmbedding(nn.Module):
     """
-    This module implements the PosEmbedding class for positional embedding.
 
-    Attributes:
-        - class_token (torch.Tensor): A learnable parameter representing the class token with shape (BATCH_SIZE, 1, EMBED_DIM).
-        - pos_embedding (torch.Tensor): A learnable parameter representing the positional embedding with shape (BATCH_SIZE, NUM_PATCHES+1, EMBED_DIM).
-        - dropout (torch.nn.Dropout): Dropout layer for regularization.
-
-    Methods:
-        - forward(x): Performs the forward pass of the PosEmbedding module.
-
-        Example usage:
-            >>> pos_embedding = PosEmbedding()
-            >>> output = pos_embedding.forward(x)
-            >>> print(output.size())
     """
     def __init__(self):
         super().__init__()
@@ -220,6 +129,7 @@ x = pos_embedding(x)
 # Codeblock 12
 class TransformerEncoder(nn.Module):
     """
+
     """
     def __init__(self):
         super().__init__()
@@ -277,20 +187,8 @@ x = transformer_encoder(x)
 # Codeblock 15
 class MLPHead(nn.Module):
     """
-    This module defines the MLPHead class, which is a subclass of nn.Module.
 
-    class MLPHead(nn.Module):
-        def __init__(self):
-            super().__init__()
-
-            self.norm = nn.LayerNorm(EMBED_DIM)
-            self.linear_0 = nn.Linear(in_features=EMBED_DIM, out_features=EMBED_DIM)
-            self.gelu = nn.GELU()
-            self.linear_1 = nn.Linear(in_features=EMBED_DIM, out_features=NUM_CLASSES)
-
-
-        def forward(self, x):
-            """
+    """
     def __init__(self):
         super().__init__()
         
@@ -326,28 +224,7 @@ x = mlp_head(x)
 # Codeblock 17
 class ViT(nn.Module):
     """
-    This code represents a class called "ViT" which is a custom implementation of the Vision Transformer model.
 
-    The class inherits from the nn.Module class from the PyTorch framework, which allows it to be used as a module in a larger neural network architecture.
-
-    The "__init__" method initializes the class and defines its components.
-
-    - The "patcher" attribute is an instance of the "PatcherConv" class, which is responsible for patching the input image.
-    - The "pos_embedding" attribute is an instance of the "PosEmbedding" class, which adds positional embeddings to the patches.
-    - The "transformer_encoders" attribute is an nn.Sequential container that holds a series of "TransformerEncoder" instances. The number of encoder instances is determined by the "NUM_ENCODERS" constant.
-    - The "mlp_head" attribute is an instance of the "MLPHead" class, which represents the MLP-based classification head of the model.
-
-    The "forward" method performs the forward pass of the model.
-
-    - The input tensor "x" is patched using the "patcher" attribute.
-    - The positional embeddings are added to the patches using the "pos_embedding" attribute.
-    - The patches are then passed through the transformer encoders using the "transformer_encoders" attribute.
-    - Only the first element of the resulting tensor along the dimension 0 is selected using indexing.
-    - Finally, the selected tensor is passed through the MLP head using the "mlp_head" attribute.
-
-    The output of the "forward" method is the final output of the model.
-
-    Note: This documentation assumes that the imported modules and constants are properly defined.
     """
     def __init__(self):
         super().__init__()
