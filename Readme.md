@@ -4,11 +4,9 @@
 ## Guide
 
 
-![Amir Jafari - Deep Learning](https://img.shields.io/static/v1?label=Amir+Jafari&message=Deep+Learning&color=blue&logo=github)
+![Amir Jafari - Deep Learning](https://img.shields.io/static/v1?label=Amir+Jafari&message=Deep+Learning&color=blue&logo=github) [![License](https://img.shields.io/badge/License-MIT-blue)](#license)
 
-[![License](https://img.shields.io/badge/License-MIT-blue)](#license)
-
-[![dependency - Python](https://img.shields.io/badge/dependency-Python-blue)](https://pypi.org/project/Python)
+[//]: # ([![dependency - Python]&#40;https://img.shields.io/badge/dependency-Python-blue&#41;]&#40;https://pypi.org/project/Python&#41;)
 
 
 * Pytorch
