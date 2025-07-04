@@ -12,7 +12,11 @@ import torch.nn as nn
 from sklearn.metrics import accuracy_score, confusion_matrix
 import nltk
 from tqdm import tqdm
-nltk.download('punkt')
+# Download punkt and punkt_tab to a specific directory and add that directory to NLTK's data path
+nltk_data_dir = os.path.join(os.path.expanduser('~'), 'nltk_data')
+nltk.download('punkt', quiet=True, download_dir=nltk_data_dir)
+nltk.download('punkt_tab', quiet=True, download_dir=nltk_data_dir)
+nltk.data.path.append(nltk_data_dir)
 
 if "SST-2" not in os.listdir(os.getcwd()):
     try:
@@ -103,7 +107,7 @@ def convert_to_ids(raw_sentences, vocab_dict, pad_to):
 
 
 def get_glove_embeddings(vocab_dict):
-    with open("glove.6B.50d.txt", "r") as s:
+    with open(os.path.join(os.getcwd(), "glove.6B.50d.txt"), "r") as s:
         glove = s.read()
     embeddings_dict = {}
     for line in glove.split("\n")[:-1]:
@@ -152,22 +156,27 @@ class CNN(nn.Module):
 
 
 # %% -------------------------------------- Data Prep ------------------------------------------------------------------
-data_train = pd.read_csv("SST-2/train.tsv", sep="\t")
+data_train = pd.read_csv(os.path.join(os.getcwd(), "SST-2", "train.tsv"), sep="\t")
 x_train_raw, y_train = data_train["sentence"].values, torch.LongTensor(data_train["label"].values).to(device)
-data_dev = pd.read_csv("SST-2/dev.tsv", sep="\t")
+data_dev = pd.read_csv(os.path.join(os.getcwd(), "SST-2", "dev.tsv"), sep="\t")
 x_dev_raw, y_dev = data_dev["sentence"].values, torch.LongTensor(data_dev["label"].values).to(device)
 
+# Ensure the directory exists before reading/writing in it
+if not os.path.exists(os.path.join(os.getcwd(), "example_prep_data")):
+    os.makedirs(os.path.join(os.getcwd(), "example_prep_data"))
+
 try:
-    with open("example_prep_data/vocab_dict.json", "r") as s:
+    with open(os.path.join(os.getcwd(), "example_prep_data", "vocab_dict.json"), "r") as s:
         token_ids = json.load(s)
-    msl = np.load("example_prep_data/max_sequence_length.npy").item()
-except:
+    msl = np.load(os.path.join(os.getcwd(), "example_prep_data", "max_sequence_length.npy")).item()
+except FileNotFoundError:
     print("Tokenizing all the examples to get a vocab dict and the maximum sequence length...")
     token_ids, msl = extract_vocab_dict_and_msl(x_train_raw, x_dev_raw)
-    os.mkdir("example_prep_data")
-    with open("example_prep_data/vocab_dict.json", "w") as s:
+
+    # Save the results in the example_prep_data directory
+    with open(os.path.join(os.getcwd(), "example_prep_data", "vocab_dict.json"), "w") as s:
         json.dump(token_ids, s)
-    np.save("example_prep_data/max_sequence_length.npy", np.array([msl]))
+    np.save(os.path.join(os.getcwd(), "example_prep_data", "max_sequence_length.npy"), np.array([msl]))
 if args.seq_len == "get_max_from_data":
     args.seq_len = msl
 del data_train, data_dev
@@ -175,14 +184,14 @@ del data_train, data_dev
 glove_embeddings = get_glove_embeddings(token_ids)
 
 try:
-    x_train = np.load("example_prep_data/prep_train_len{}.npy".format(args.seq_len))
-    x_dev = np.load("example_prep_data/prep_dev_len{}.npy".format(args.seq_len))
+    x_train = np.load(os.path.join(os.getcwd(), "example_prep_data", "prep_train_len{}.npy".format(args.seq_len)))
+    x_dev = np.load(os.path.join(os.getcwd(), "example_prep_data", "prep_dev_len{}.npy".format(args.seq_len)))
 except:
     print("Converting all the sentences to sequences of token ids...")
     x_train = convert_to_ids(x_train_raw, token_ids, args.seq_len)
-    np.save("example_prep_data/prep_train_len{}.npy".format(args.seq_len), x_train)
+    np.save(os.path.join(os.getcwd(), "example_prep_data", "prep_train_len{}.npy".format(args.seq_len)), x_train)
     x_dev = convert_to_ids(x_dev_raw, token_ids, args.seq_len)
-    np.save("example_prep_data/prep_dev_len{}.npy".format(args.seq_len), x_dev)
+    np.save(os.path.join(os.getcwd(), "example_prep_data", "prep_dev_len{}.npy".format(args.seq_len)), x_dev)
 del x_train_raw, x_dev_raw
 
 x_train, x_dev = torch.LongTensor(x_train).to(device), torch.LongTensor(x_dev).to(device)
@@ -229,12 +238,12 @@ if args.train:
             epoch, loss_train/train_steps, acc(x_train, y_train), loss_test, acc_dev))
 
         if acc_dev > acc_dev_best and args.save_model:
-            torch.save(model.state_dict(), "cnn_sentiment.pt")
+            torch.save(model.state_dict(), os.path.join(os.getcwd(), "cnn_sentiment.pt"))
             print("The model has been saved!")
             acc_dev_best = acc_dev
 
 # %% ------------------------------------------ Final test -------------------------------------------------------------
-model.load_state_dict(torch.load("cnn_sentiment.pt"))
+model.load_state_dict(torch.load(os.path.join(os.getcwd(), "cnn_sentiment.pt")))
 model.eval()
 y_test_pred = acc(x_dev, y_dev, return_labels=True)
 print("The accuracy on the test set is {:.2f}".format(100*accuracy_score(y_dev.cpu().numpy(), y_test_pred), "%"))
