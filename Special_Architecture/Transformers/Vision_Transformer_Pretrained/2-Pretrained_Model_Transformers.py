@@ -4,7 +4,8 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 from tqdm import tqdm
-from transformers import AutoModelForImageClassification, AutoConfig, AdamW
+from transformers import AutoModelForImageClassification, AutoConfig
+from torch.optim import AdamW
 # -------------------------------------------------------------------------------------------------------
 # Define transform to normalize data
 transform = transforms.Compose([
