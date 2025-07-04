@@ -138,11 +138,11 @@ class GAN:
             # Train the generator
             noise = np.random.normal(0, 1, size=(batch_size, latent_dim))
             loss_gen = self.train_gen.train_on_batch(noise, np.ones((batch_size, 1)))
-            self.loss_G.append(loss_gen[0])  # Assuming loss is at index 0
+            self.loss_G.append(loss_gen)  # loss_gen is a scalar value
 
             if (epoch + 1) % (steps_per_epoch // 10) == 0:
                 print('Steps (%d / %d): [Loss_D_real: %f, Loss_D_fake: %f, acc: %.2f%%] [Loss_G: %f]' %
-                      (epoch + 1, steps_per_epoch, loss_real[0], loss_fake[0], 100 * self.loss_D[-1], loss_gen[0]))
+                      (epoch + 1, steps_per_epoch, loss_real[0], loss_fake[0], 100 * self.loss_D[-1], loss_gen))
 
         return
 
