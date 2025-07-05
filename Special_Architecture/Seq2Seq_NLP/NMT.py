@@ -77,7 +77,7 @@ class Decoder(nn.Module):
         return output, hidden
 
 
-# Seq2Seq model
+# Seq2Seq_NLP model
 class Seq2Seq(nn.Module):
     def __init__(self, encoder, decoder):
         super(Seq2Seq, self).__init__()
