@@ -4,7 +4,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 from tensorflow.keras import Model, Sequential
-from tensorflow.keras.layers import Input, Reshape, Dense, LeakyReLU, Flatten, BatchNormalization
+from tensorflow.keras.layers import Input, Reshape, Dense, LeakyReLU, Flatten, BatchNormalization, Dropout
 from tensorflow.keras.initializers import glorot_normal
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.datasets.fashion_mnist import load_data
@@ -36,17 +36,17 @@ n_classes = len(np.unique(y_train))
 
 discriminator_optimizer = Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
 generator_optimizer = Adam(learning_rate=0.0002, beta_1=0.5, beta_2=0.9)
-latent_dim = 32
+latent_dim = 100  # Increased latent dimension for better representation
 
 def generator_fc(generator_optimizer):
     noise = Input(shape=(latent_dim,))
-    x = Dense(128, kernel_initializer=weight_init)(noise)
-    x = BatchNormalization()(x)
-    x = LeakyReLU(0.2)(x)
-    x = Dense(256, kernel_initializer=weight_init)(x)
+    x = Dense(256, kernel_initializer=weight_init)(noise)
     x = BatchNormalization()(x)
     x = LeakyReLU(0.2)(x)
     x = Dense(512, kernel_initializer=weight_init)(x)
+    x = BatchNormalization()(x)
+    x = LeakyReLU(0.2)(x)
+    x = Dense(1024, kernel_initializer=weight_init)(x)
     x = BatchNormalization()(x)
     x = LeakyReLU(0.2)(x)
     x = Dense(np.prod(img_size), activation='tanh', kernel_initializer=weight_init)(x)
@@ -57,12 +57,15 @@ def generator_fc(generator_optimizer):
 def discriminator_fc(discriminator_optimizer):
     img = Input(shape=img_size)
     x = Flatten()(img)
+    x = Dense(1024, kernel_initializer=weight_init)(x)
+    x = LeakyReLU(0.2)(x)
+    x = Dropout(0.3)(x)
     x = Dense(512, kernel_initializer=weight_init)(x)
     x = LeakyReLU(0.2)(x)
+    x = Dropout(0.3)(x)
     x = Dense(256, kernel_initializer=weight_init)(x)
     x = LeakyReLU(0.2)(x)
-    x = Dense(128, kernel_initializer=weight_init)(x)
-    x = LeakyReLU(0.2)(x)
+    x = Dropout(0.3)(x)
     out = Dense(1, activation='sigmoid', kernel_initializer=weight_init)(x)
     model = Model(inputs=img, outputs=out)
     model.compile(optimizer=discriminator_optimizer, loss='binary_crossentropy', metrics=['accuracy'])
@@ -84,28 +87,42 @@ class GAN:
         self.discriminator = d_model
         self.train_gen = generator_trainer(self.generator, self.discriminator)
         self.loss_D, self.loss_G = [], []
+        self.acc_D = []
 
     def train(self, imgs, steps_per_epoch=50, batch_size=128):
         bs_half = batch_size // 2
 
         for epoch in range(steps_per_epoch):
+            # Train Discriminator
             idx = np.random.randint(0, imgs.shape[0], bs_half)
             real_img = imgs[idx]
 
             noise = np.random.normal(0, 1, size=(bs_half, latent_dim))
-            fake_img = self.generator.predict(noise)
+            fake_img = self.generator.predict(noise, verbose=0)
 
-            loss_fake = self.discriminator.train_on_batch(fake_img, np.zeros((bs_half, 1)))
-            loss_real = self.discriminator.train_on_batch(real_img, np.ones((bs_half, 1)))
-            self.loss_D.append(0.5 * (loss_fake[0] + loss_real[0]))
+            # Label smoothing for better training stability
+            real_labels = np.ones((bs_half, 1)) * 0.9  # Smooth real labels
+            fake_labels = np.zeros((bs_half, 1)) + 0.1  # Smooth fake labels
 
+            loss_real = self.discriminator.train_on_batch(real_img, real_labels)
+            loss_fake = self.discriminator.train_on_batch(fake_img, fake_labels)
+
+            # Store discriminator loss and accuracy properly
+            d_loss = 0.5 * (loss_fake[0] + loss_real[0])
+            d_acc = 0.5 * (loss_fake[1] + loss_real[1])
+            self.loss_D.append(d_loss)
+            self.acc_D.append(d_acc)
+
+            # Train Generator
             noise = np.random.normal(0, 1, size=(batch_size, latent_dim))
-            loss_gen = self.train_gen.train_on_batch(noise, np.ones((batch_size, 1)))
+            # Generator wants discriminator to classify fake images as real
+            valid_labels = np.ones((batch_size, 1))
+            loss_gen = self.train_gen.train_on_batch(noise, valid_labels)
             self.loss_G.append(loss_gen)
 
             if (epoch + 1) % (steps_per_epoch // 10) == 0:
                 print('Steps (%d / %d): [Loss_D_real: %f, Loss_D_fake: %f, acc: %.2f%%] [Loss_G: %f]' %
-                      (epoch + 1, steps_per_epoch, loss_real[0], loss_fake[0], 100 * self.loss_D[-1], loss_gen))
+                      (epoch + 1, steps_per_epoch, loss_real[0], loss_fake[0], 100 * d_acc, loss_gen))
 
 d_model = discriminator_fc(discriminator_optimizer)
 g_model = generator_fc(generator_optimizer)
