@@ -15,7 +15,7 @@ a = 10              # Network output size
 p = torch.randn(Batch_size, R, device=device, dtype=dtype, requires_grad=False)
 t = torch.randn(Batch_size, a, device=device, dtype=dtype, requires_grad=False)
 #----------------------------------------------------------------------------
-w1 = torch.randn(R, S, device=device, dtype=dtype, requires_grad=True)
+w1 = torch.randn(R, S, device=device, dtype=dtype, requires_grad=False)
 w2 = torch.randn(S, a, device=device, dtype=dtype, requires_grad=True)
 
 learning_rate = 1e-6

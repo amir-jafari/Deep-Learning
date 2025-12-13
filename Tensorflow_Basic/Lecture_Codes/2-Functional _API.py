@@ -11,4 +11,4 @@ ouputs = tf.keras.layers.Dense(1, activation='relu')(x1)
 
 model = tf.keras.models.Model(inputs, ouputs)
 model.compile(loss='mse',optimizer='adam',metrics=['accuracy'])
-model.fit(x, y, epochs=10)
+model.fit(x, y, epochs=100)
