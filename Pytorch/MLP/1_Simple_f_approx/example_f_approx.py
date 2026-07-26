@@ -8,6 +8,8 @@ import torch.nn as nn
 # %% ----------------------------------- Hyper Parameters --------------------------------------------------------------
 # It is always good practice to set the hyper-parameters at the beginning of the script
 # And even better to define a params class if the script is long and complex
+# Gets the device to move Tensors to (defaults to GPU (cuda) if available)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 LR = 2.5e-1
 N_NEURONS = 10
 N_EPOCHS = 50000
@@ -39,13 +41,13 @@ t = np.exp(p) - np.sin(2*np.pi*p)  # (100,)
 # Converts to Tensors and reshapes to suitable shape (n_examples, 1)
 # requires_grad=True on the input so that the gradients are computed when calling loss.backward()
 # i.e, so that all the operations performed on p and on their outputs are made part of the Computational Graph
-p = torch.Tensor(p).reshape(-1, 1)
+p = torch.Tensor(p).reshape(-1, 1).to(device)
 p.requires_grad = True
-t = torch.Tensor(t).reshape(-1, 1)
+t = torch.Tensor(t).reshape(-1, 1).to(device)
 
 # %% -------------------------------------- Training Prep --------------------------------------------------------------
 # Initializes model and moves it to GPU if available
-model = MLP(N_NEURONS)
+model = MLP(N_NEURONS).to(device)
 # Initializes a Gradient Descent Optimizer with default hyper-parameters
 # We pass the model.parameters() generator so that all the model's parameters are updated
 optimizer = torch.optim.SGD(model.parameters(), lr=LR)
@@ -76,8 +78,9 @@ plt.title("MLP fit to $y = e^x - sin(2 \\pi x)$ | MSE: {:.5f}".format(loss.item(
 plt.xlabel("x")
 plt.ylabel("y")
 # .detach() to take the Tensors out of the computational graph
+# .cpu() to move the Tensors back to the CPU so they can be converted to NumPy arrays
 # .numpy() to convert the Tensors to NumPy arrays
-plt.plot(p.detach().numpy(), t.numpy(), label="Real Function")
-plt.plot(p.detach().numpy(), t_pred.detach().numpy(), linestyle="dashed", label="MLP Approximation")
+plt.plot(p.detach().cpu().numpy(), t.cpu().numpy(), label="Real Function")
+plt.plot(p.detach().cpu().numpy(), t_pred.detach().cpu().numpy(), linestyle="dashed", label="MLP Approximation")
 plt.legend()
 plt.show()

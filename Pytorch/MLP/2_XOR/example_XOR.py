@@ -7,6 +7,8 @@ from sklearn.metrics import accuracy_score
 
 
 # %% ----------------------------------- Hyper Parameters --------------------------------------------------------------
+# Gets the device to move Tensors to (defaults to GPU (cuda) if available)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 LR = 0.02
 N_NEURONS = 2
 N_EPOCHS = 10000
@@ -28,12 +30,12 @@ class MLP(nn.Module):
 # %% -------------------------------------- Data Prep ------------------------------------------------------------------
 p = np.array([[0, 0], [1, 1], [0, 1], [1, 0]])
 t = np.array([0, 0, 1, 1])
-p = torch.FloatTensor(p)
+p = torch.FloatTensor(p).to(device)
 p.requires_grad = True
-t = torch.Tensor(t).long()
+t = torch.Tensor(t).long().to(device)
 
 # %% -------------------------------------- Training Prep --------------------------------------------------------------
-model = MLP(N_NEURONS)
+model = MLP(N_NEURONS).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 # A classification problem is usually approached with a Categorical Cross-Entropy performance index
 criterion = nn.CrossEntropyLoss()  # This one combines both the loss and the Log-SoftMax output function,
@@ -52,10 +54,10 @@ for epoch in range(N_EPOCHS):
         print("Epoch {} | Loss {:.5f}".format(epoch, loss.item()))
 
 # %% -------------------------------------- Check Approx ---------------------------------------------------------------
-print(accuracy_score(t.numpy(), np.argmax(logits.detach().numpy(), axis=1))*100)
+print(accuracy_score(t.cpu().numpy(), np.argmax(logits.detach().cpu().numpy(), axis=1))*100)
 
 # Gets weights and biases, and from them the DBs, and plots them
-w, b = model.linear1.weight.detach().numpy(), model.linear1.bias.detach().numpy()
+w, b = model.linear1.weight.detach().cpu().numpy(), model.linear1.bias.detach().cpu().numpy()
 a = np.arange(0, 1.1, 0.1)
 db1 = -w[0, 0]*a/w[0, 1] - b[0]/w[0, 1]
 db2 = -w[1, 0]*a/w[1, 1] - b[1]/w[1, 1]
