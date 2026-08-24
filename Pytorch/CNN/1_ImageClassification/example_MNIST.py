@@ -5,6 +5,8 @@ import torch.nn as nn
 from torchvision import datasets
 from sklearn.metrics import accuracy_score
 
+
+
 # %% --------------------------------------- Set-Up --------------------------------------------------------------------
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 torch.manual_seed(42)
