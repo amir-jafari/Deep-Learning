@@ -311,9 +311,9 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/deep-learning-repo/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/deep-learning-repo/discussions)
-- **Email**: your.email@example.com
+- **Issues**: [GitHub Issues](https://github.com/amir-jafari/Deep-Learning/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/amir-jafari/Deep-Learning/discussions)
+- **Email**: ajafari@gwu.edu
 
 ## 📄 License
 

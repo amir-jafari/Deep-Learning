@@ -19,5 +19,5 @@ class Mymodel(tf.keras.models.Model):
 model = Mymodel()
 
 model.compile(loss='mse',optimizer='sgd',metrics=['accuracy'])
-model.fit(x, y, epochs=10)
+model.fit(x, y, epochs=100)
 
